@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini-SNMP Network Monitor</title>
+<style>
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #111827;
+        color: #f3f4f6;
+    }
+    header {
+        padding: 22px 30px;
+        background: #1f2937;
+        border-bottom: 1px solid #374151;
+    }
+    h1 { margin: 0 0 6px; font-size: 26px; }
+    .subtitle { color: #9ca3af; }
+    main { padding: 24px 30px; max-width: 1400px; margin: auto; }
+    .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    .card {
+        background: #1f2937;
+        border: 1px solid #374151;
+        border-radius: 12px;
+        padding: 18px;
+    }
+    .label { color: #9ca3af; font-size: 13px; }
+    .value { font-size: 30px; font-weight: bold; margin-top: 7px; }
+    .panel {
+        background: #1f2937;
+        border: 1px solid #374151;
+        border-radius: 12px;
+        padding: 18px;
+        margin-bottom: 20px;
+        overflow-x: auto;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th, td {
+        padding: 11px 9px;
+        border-bottom: 1px solid #374151;
+        text-align: left;
+        white-space: nowrap;
+    }
+    th { color: #9ca3af; font-size: 12px; }
+    .online { color: #34d399; font-weight: bold; }
+    .offline, .timeout, .error { color: #f87171; font-weight: bold; }
+    .warn { color: #fbbf24; font-weight: bold; }
+    .small { color: #9ca3af; font-size: 12px; }
+    .alert {
+        padding: 10px 12px;
+        border-left: 4px solid #f87171;
+        background: #111827;
+        margin-bottom: 8px;
+        border-radius: 6px;
+    }
+</style>
+</head>
+<body>
+<header>
+    <h1>Mini-SNMP Network Monitor</h1>
+    <div class="subtitle">Manager • Agents • Métricas • Falhas • Alertas</div>
+</header>
+
+<main>
+    <section class="cards">
+        <div class="card"><div class="label">Agents</div><div id="agents" class="value">-</div></div>
+        <div class="card"><div class="label">Online</div><div id="online" class="value">-</div></div>
+        <div class="card"><div class="label">Offline/Erro</div><div id="offline" class="value">-</div></div>
+        <div class="card"><div class="label">CPU média</div><div id="cpu" class="value">-</div></div>
+        <div class="card"><div class="label">Memória média</div><div id="memory" class="value">-</div></div>
+    </section>
+
+    <section class="panel">
+        <h2>Estado dos Agents</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Agent</th>
+                    <th>Status</th>
+                    <th>CPU</th>
+                    <th>Memória</th>
+                    <th>Uptime</th>
+                    <th>RX</th>
+                    <th>TX</th>
+                    <th>Latência</th>
+                    <th>Atualização</th>
+                </tr>
+            </thead>
+            <tbody id="table"></tbody>
+        </table>
+    </section>
+
+    <section class="panel">
+        <h2>Alertas / Traps</h2>
+        <div id="alerts"><div class="small">Nenhum alerta registrado.</div></div>
+    </section>
+
+    <div class="small">Atualização automática a cada 3 segundos.</div>
+</main>
+
+<script>
+function fmtBytes(n) {
+    if (!Number.isFinite(n)) return "-";
+    const units = ["B", "KB", "MB", "GB", "TB"];
+    let i = 0;
+    while (n >= 1024 && i < units.length - 1) {
+        n /= 1024;
+        i++;
+    }
+    return `${n.toFixed(1)} ${units[i]}`;
+}
+
+function fmtUptime(sec) {
+    if (!Number.isFinite(sec)) return "-";
+    const d = Math.floor(sec / 86400);
+    sec %= 86400;
+    const h = Math.floor(sec / 3600);
+    sec %= 3600;
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return `${d}d ${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+}
+
+function statusClass(status) {
+    return status.toLowerCase().replace(/[^a-z]/g, "");
+}
+
+async function update() {
+    try {
+        const status = await fetch("/api/status", {cache: "no-store"}).then(r => r.json());
+
+        document.getElementById("agents").textContent = status.length;
+        const online = status.filter(x => x.status === "ONLINE");
+        document.getElementById("online").textContent = online.length;
+        document.getElementById("offline").textContent = status.length - online.length;
+
+        if (online.length) {
+            document.getElementById("cpu").textContent =
+                (online.reduce((a,x) => a + x.cpu, 0) / online.length).toFixed(1) + "%";
+            document.getElementById("memory").textContent =
+                (online.reduce((a,x) => a + x.memory, 0) / online.length).toFixed(1) + "%";
+        } else {
+            document.getElementById("cpu").textContent = "-";
+            document.getElementById("memory").textContent = "-";
+        }
+
+        document.getElementById("table").innerHTML = status.map(x => `
+            <tr>
+                <td>${x.agent}</td>
+                <td class="${statusClass(x.status)}">${x.status}</td>
+                <td>${x.status === "ONLINE" ? x.cpu.toFixed(2) + "%" : "-"}</td>
+                <td>${x.status === "ONLINE" ? x.memory.toFixed(2) + "%" : "-"}</td>
+                <td>${x.status === "ONLINE" ? fmtUptime(x.uptime) : "-"}</td>
+                <td>${x.status === "ONLINE" ? fmtBytes(x.rx) : "-"}</td>
+                <td>${x.status === "ONLINE" ? fmtBytes(x.tx) : "-"}</td>
+                <td>${x.status === "ONLINE" ? x.latency_us + " µs" : "-"}</td>
+                <td>${x.timestamp || "-"}</td>
+            </tr>
+        `).join("");
+
+        const alerts = await fetch("/api/alerts", {cache: "no-store"}).then(r => r.json());
+        const alertBox = document.getElementById("alerts");
+
+        if (!alerts.length) {
+            alertBox.innerHTML = '<div class="small">Nenhum alerta registrado.</div>';
+        } else {
+            alertBox.innerHTML = alerts.map(a => `
+                <div class="alert">
+                    <strong>${a.agent}</strong> • OID ${a.oid} • valor ${a.value} • limite ${a.threshold}
+                </div>
+            `).join("");
+        }
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+update();
+setInterval(update, 3000);
+</script>
+</body>
+</html>

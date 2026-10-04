@@ -1,0 +1,10 @@
+certs/*.key
+certs/*.crt
+certs/*.csr
+certs/*.srl
+logs/*.csv
+logs/*.log
+experiments/results/*.csv
+experiments/results/*.json
+__pycache__/
+*.pyc
