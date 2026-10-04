@@ -244,4 +244,3 @@ make test-tls
 ```
 
 Os resultados são gravados em `experiments/results/`. Os cenários incluem protocolo, MIB, SET remoto, traps, overhead, escalabilidade com 1/3/5/10 Agents, falha, dashboard, múltiplos Managers e comparação TLS.
-# trabalho_snmp
