@@ -13,10 +13,13 @@
 #include "../common/tls.h"
 #include "metrics.h"
 
-static double cpu_limit = 80.0;
+static double cpu_limit = 0.10;
 static double memory_limit = 90.0;
 static char agent_name[64] = "Agent";
 static int tls_enabled = 0;
+
+/* MODO DE TESTE: simula ausência de resposta do Agent */
+static int simulate_no_response = 0;
 
 static int send_line(int fd, SSL *ssl, const char *line) {
     if (ssl) return SSL_write(ssl, line, (int)strlen(line)) <= 0 ? -1 : 0;
@@ -156,7 +159,7 @@ static void handle_client(int client_fd, SSL *ssl,
         }
 
         if (strcmp(command, MSG_GET) == 0) {
-            char value[128];
+            char value[1200];
 
             if (parts < 2 || metric_value(arg1, value, sizeof(value)) != 0) {
                 if (parts >= 2) {
@@ -167,6 +170,21 @@ static void handle_client(int client_fd, SSL *ssl,
                 } else {
                     send_line(client_fd, ssl, "ERROR INVALID_REQUEST\n");
                 }
+                continue;
+            }
+
+            /*
+             * MODO DE TESTE:
+             * O Agent recebeu um GET válido, mas propositalmente
+             * não envia a resposta. O Manager deverá atingir
+             * seu tempo limite e detectar a ausência de resposta.
+             */
+            if (simulate_no_response) {
+                printf("TESTE: GET recebido de %s - resposta suprimida.\n",
+                       agent_name);
+                fflush(stdout);
+
+                sleep(10);
                 continue;
             }
 
@@ -223,8 +241,9 @@ static void handle_client(int client_fd, SSL *ssl,
 
 int main(int argc, char *argv[]) {
     if (argc < 3) {
-        printf("Uso: %s <porta> <nome> [trap_host] [trap_port] [--tls]\n", argv[0]);
+        printf("Uso: %s <porta> <nome> [trap_host] [trap_port] [--tls] [--no-response]\n", argv[0]);
         printf("Exemplo: %s 5001 Agent1 127.0.0.1 6000 --tls\n", argv[0]);
+        printf("Exemplo para teste de timeout: %s 5002 Agent2 127.0.0.1 6000 --no-response\n", argv[0]);
         return 1;
     }
 
@@ -241,6 +260,12 @@ int main(int argc, char *argv[]) {
 
     if (argc >= 6 && strcmp(argv[5], "--tls") == 0)
         tls_enabled = 1;
+
+    if (argc >= 6 && strcmp(argv[5], "--no-response") == 0)
+        simulate_no_response = 1;
+
+    if (argc >= 7 && strcmp(argv[6], "--no-response") == 0)
+        simulate_no_response = 1;
 
     signal(SIGPIPE, SIG_IGN);
 
@@ -294,6 +319,10 @@ int main(int argc, char *argv[]) {
     printf("Agent %s iniciado na porta %d.\n", agent_name, port);
     printf("Threshold CPU: %.1f%% | Memoria: %.1f%%\n",
            cpu_limit, memory_limit);
+
+    if (simulate_no_response) {
+        printf("MODO DE TESTE: ausencia de resposta ativado.\n");
+    }
 
     while (1) {
         struct sockaddr_in client_addr;

@@ -14,6 +14,7 @@
 #include "../common/protocol.h"
 #include "../common/mib.h"
 #include "../common/tls.h"
+#define MAX_AGENTS 1000
 
 typedef struct {
     char host[64];
@@ -32,8 +33,8 @@ typedef struct {
     long long latency_us;
 } AgentState;
 
-static Agent agents[128];
-static AgentState states[128];
+static Agent agents[MAX_AGENTS];
+static AgentState states[MAX_AGENTS];
 static int agent_count = 0;
 static int interval_sec = 5;
 static volatile int running = 1;
@@ -385,7 +386,7 @@ static int load_agents(const char *filename) {
 
     char line[256];
 
-    while (fgets(line, sizeof(line), f) && agent_count < 128) {
+    while (fgets(line, sizeof(line), f) && agent_count < MAX_AGENTS) {
         if (line[0] == '#' || line[0] == '\n') continue;
 
         char host[64], name[64];

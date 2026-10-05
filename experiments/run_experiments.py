@@ -304,7 +304,7 @@ def run_overhead_test():
             "note": "Overhead no nível da aplicação; não inclui cabeçalhos TCP/IP nem registros TLS.",
         }
         print(f"        bytes totais={total_bytes}, payload útil={useful_bytes}, "
-              f"overhead={overhead_bytes} ({ratio*100:.1f}%)")
+              f"overhead={overhead_bytes} ({ratio*1000:.1f}%)")
         return result
     finally:
         stop_all(agents)
@@ -320,7 +320,7 @@ def run_tls_comparison(duration):
         "experiment": "tls_comparison",
         "plain_latency_avg_us": p,
         "tls_latency_avg_us": t,
-        "tls_overhead_pct": round(((t - p) / p) * 100, 2) if p else None,
+        "tls_overhead_pct": round(((t - p) / p) * 1000, 2) if p else None,
     }
     print(f"        sem TLS={p:.0f} us | TLS={t:.0f} us | "
           f"diferença={result['tls_overhead_pct']}%")
@@ -509,7 +509,7 @@ def main():
                 "tls_success_pct": t.get("success_rate_pct"),
                 "plain_latency_avg_us": p_lat,
                 "tls_latency_avg_us": t_lat,
-                "tls_difference_pct": round(((t_lat - p_lat) / p_lat) * 100, 2) if p_lat else None,
+                "tls_difference_pct": round(((t_lat - p_lat) / p_lat) * 1000, 2) if p_lat else None,
             })
         write_csv(comparison, RESULTS / "scalability_tls_comparison.csv")
         (RESULTS / "scalability_tls_comparison.json").write_text(
