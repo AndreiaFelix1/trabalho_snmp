@@ -1,0 +1,80 @@
+[
+  {
+    "agents": 1,
+    "samples": 27,
+    "online_samples": 27,
+    "success_rate_pct": 100.0,
+    "latency_avg_us": 103558.44,
+    "latency_min_us": 101322.0,
+    "latency_max_us": 109968.0,
+    "experiment": "scalability",
+    "tls": 1,
+    "configured_agents": 1,
+    "duration_sec": 61.11
+  },
+  {
+    "agents": 10,
+    "samples": 160,
+    "online_samples": 159,
+    "success_rate_pct": 99.38,
+    "latency_avg_us": 103785.23,
+    "latency_min_us": 101073.0,
+    "latency_max_us": 135430.0,
+    "experiment": "scalability",
+    "tls": 1,
+    "configured_agents": 10,
+    "duration_sec": 62.78
+  },
+  {
+    "agents": 50,
+    "samples": 284,
+    "online_samples": 283,
+    "success_rate_pct": 99.65,
+    "latency_avg_us": 104093.31,
+    "latency_min_us": 100835.0,
+    "latency_max_us": 127661.0,
+    "experiment": "scalability",
+    "tls": 1,
+    "configured_agents": 50,
+    "duration_sec": 72.8
+  },
+  {
+    "agents": 100,
+    "samples": 300,
+    "online_samples": 300,
+    "success_rate_pct": 100.0,
+    "latency_avg_us": 103510.42,
+    "latency_min_us": 100715.0,
+    "latency_max_us": 120027.0,
+    "experiment": "scalability",
+    "tls": 1,
+    "configured_agents": 100,
+    "duration_sec": 79.6
+  },
+  {
+    "agents": 333,
+    "samples": 333,
+    "online_samples": 333,
+    "success_rate_pct": 100.0,
+    "latency_avg_us": 103789.9,
+    "latency_min_us": 100688.0,
+    "latency_max_us": 121989.0,
+    "experiment": "scalability",
+    "tls": 1,
+    "configured_agents": 500,
+    "duration_sec": 124.46
+  },
+  {
+    "agents": 338,
+    "samples": 338,
+    "online_samples": 337,
+    "success_rate_pct": 99.7,
+    "latency_avg_us": 104132.84,
+    "latency_min_us": 100882.0,
+    "latency_max_us": 197633.0,
+    "experiment": "scalability",
+    "tls": 1,
+    "configured_agents": 1000,
+    "duration_sec": 126.14
+  }
+]

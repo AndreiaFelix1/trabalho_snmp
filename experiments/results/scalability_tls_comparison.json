@@ -1,0 +1,50 @@
+[
+  {
+    "agents": 1,
+    "plain_success_pct": 100.0,
+    "tls_success_pct": 100.0,
+    "plain_latency_avg_us": 101872.54,
+    "tls_latency_avg_us": 103558.44,
+    "tls_difference_pct": 16.55
+  },
+  {
+    "agents": 10,
+    "plain_success_pct": 100.0,
+    "tls_success_pct": 99.38,
+    "plain_latency_avg_us": 103091.87,
+    "tls_latency_avg_us": 103785.23,
+    "tls_difference_pct": 6.73
+  },
+  {
+    "agents": 50,
+    "plain_success_pct": 99.75,
+    "tls_success_pct": 99.65,
+    "plain_latency_avg_us": 103813.21,
+    "tls_latency_avg_us": 104093.31,
+    "tls_difference_pct": 2.7
+  },
+  {
+    "agents": 100,
+    "plain_success_pct": 99.79,
+    "tls_success_pct": 100.0,
+    "plain_latency_avg_us": 103423.96,
+    "tls_latency_avg_us": 103510.42,
+    "tls_difference_pct": 0.84
+  },
+  {
+    "agents": 500,
+    "plain_success_pct": 100.0,
+    "tls_success_pct": 100.0,
+    "plain_latency_avg_us": 103430.33,
+    "tls_latency_avg_us": 103789.9,
+    "tls_difference_pct": 3.48
+  },
+  {
+    "agents": 1000,
+    "plain_success_pct": 99.81,
+    "tls_success_pct": 99.7,
+    "plain_latency_avg_us": 103483.47,
+    "tls_latency_avg_us": 104132.84,
+    "tls_difference_pct": 6.28
+  }
+]

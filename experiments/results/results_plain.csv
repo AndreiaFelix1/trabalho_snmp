@@ -1,0 +1,7 @@
+agents,samples,online_samples,success_rate_pct,latency_avg_us,latency_min_us,latency_max_us,experiment,tls,configured_agents,duration_sec
+1,28,28,100.0,101872.54,100650.0,103618.0,scalability,0,1,61.12
+10,190,190,100.0,103091.87,100264.0,136773.0,scalability,0,10,62.55
+50,400,399,99.75,103813.21,100340.0,251927.0,scalability,0,50,69.99
+100,468,467,99.79,103423.96,100361.0,131090.0,scalability,0,100,77.63
+500,500,500,100.0,103430.33,100632.0,162423.0,scalability,0,500,119.59
+539,539,538,99.81,103483.47,100375.0,120925.0,scalability,0,1000,126.85
